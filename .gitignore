@@ -9,3 +9,4 @@ venv/
 
 # Raw downloaded data
 data/raw/*.sql.gz
+data/raw/*.sql
