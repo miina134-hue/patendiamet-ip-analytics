@@ -399,3 +399,96 @@ WHERE pct_application_number IS NOT NULL
 GROUP BY pct_application_number, application_number
 HAVING COUNT(*) > 1
 ORDER BY n DESC;
+
+-- 27. Inspect priority_date values
+SELECT
+    priority_date
+FROM patent
+WHERE priority_date IS NOT NULL
+  AND priority_date <> ''
+LIMIT 30;
+
+-- 28. Count distinct priority_date values
+SELECT
+    COUNT(*) AS non_missing_priority_date,
+    COUNT(DISTINCT priority_date) AS distinct_priority_date
+FROM patent
+WHERE priority_date IS NOT NULL
+  AND priority_date <> '';
+
+--29. Inspect IPC classification values
+SELECT
+    ipc_class
+FROM patent
+WHERE ipc_class IS NOT NULL
+  AND ipc_class <> ''
+LIMIT 30;
+
+-- 30. Inspect CPC classification values
+SELECT
+    cpc_class
+FROM patent
+WHERE cpc_class IS NOT NULL
+  AND cpc_class <> ''
+LIMIT 30;
+
+-- 31. Maximum field lengths for awkward text fields
+SELECT
+    MAX(CHAR_LENGTH(priority_date)) AS max_priority_date_length,
+    MAX(CHAR_LENGTH(ipc_class)) AS max_ipc_class_length,
+    MAX(CHAR_LENGTH(cpc_class)) AS max_cpc_class_length
+FROM patent;
+
+-- 32. Multiple priority dates
+SELECT
+    COUNT(*) AS non_missing_priority_date,
+    SUM(priority_date LIKE '%,%') AS multiple_priority_dates,
+    ROUND(
+        100.0 * SUM(priority_date LIKE '%,%') / COUNT(*),
+        1
+    ) AS pct_multiple_priority_dates
+FROM patent
+WHERE priority_date IS NOT NULL
+  AND TRIM(priority_date) <> '';
+
+-- 33. Multiple IPC and CPC classifications
+ SELECT
+    SUM(ipc_class IS NOT NULL AND TRIM(ipc_class) <> '')
+        AS non_missing_ipc,
+
+    SUM(ipc_class LIKE '%,%')
+        AS multiple_ipc,
+
+    SUM(cpc_class IS NOT NULL AND TRIM(cpc_class) <> '')
+        AS non_missing_cpc,
+
+    SUM(cpc_class LIKE '%,%')
+        AS multiple_cpc
+FROM patent;
+
+-- 34. Inspect longest priority_date values
+SELECT
+    id,
+    type,
+    application_number,
+    CHAR_LENGTH(priority_date) AS field_length,
+    LEFT(priority_date, 200) AS priority_date_preview
+FROM patent
+WHERE priority_date IS NOT NULL
+ORDER BY CHAR_LENGTH(priority_date) DESC
+LIMIT 5;
+
+-- 35. Count priority_date entries per record
+SELECT
+    id,
+    type,
+    application_number,
+    CHAR_LENGTH(priority_date) AS field_length,
+    1 + CHAR_LENGTH(priority_date)
+      - CHAR_LENGTH(REPLACE(priority_date, ',', ''))
+      AS number_of_entries
+FROM patent
+WHERE priority_date IS NOT NULL
+  AND TRIM(priority_date) <> ''
+ORDER BY number_of_entries DESC
+LIMIT 10;

@@ -84,6 +84,26 @@ No duplicates remain when 'registration_number' is evaluated together with 'type
 Repeated 'pct_application_number' values correspond to different national 'application_number' values. This indicates a legitimate one-to-many relationship
 between an international/PCT filling and national records rather than duplicated observations.
 
+### Multi-valued fields and formatting
+The database contains several fields storing multiple values as comma-separated text.
+
+
+Initial analysis identified:
+
+- 'priority_date': 7,766 of 29,625 populated records (26.2%) contain multiple entries.
+- 'ipc_class': 27,064 of 33,629 populated records (80.5%) contain multiple entries.
+- 'cpc_class': 2,273 of 2,732 populated records (83.2%) contain multiple entries.
+
+Further inspection identified unusually long lists of priority dates. The longest field contains 91 comma-separated
+entries across 1,090 characters.
+
+Some records contain extensive repetitions of identical dates.
+
+The number of entries does not necessarily represent the number of distinct priority dates. Further processing is
+required to distinguish unique dates from repeated entries.
+
+The original values will be preserved, and Python will be used to create normalized analytical representations.
+
 ## Next steps
 1. Investigate missing `registration_date` values by status.
 2. Check future and chronologically inconsistent dates.
@@ -98,4 +118,3 @@ between an international/PCT filling and national records rather than duplicated
 11. Finalize project documentation.
 12. Optionally enrich selected records using an external patent API such as EPO OPS.
 (CPC classifications for 50-100 records.)
-
