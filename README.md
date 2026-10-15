@@ -104,6 +104,15 @@ required to distinguish unique dates from repeated entries.
 
 The original values will be preserved, and Python will be used to create normalized analytical representations.
 
+### Structural and formatting consistency
+A final structural check was performed on all 34,223 records.
+
+No missing, empty, or whitespace only values were found in the 'type', 'status', or 'application_number' fields.
+
+No leading or trailing spaces were detected in these fields either.
+
+These results indicate that the key identifying and categorical fields are consistent with respest to basic completeness and whitespace formatting.
+
 ## Next steps
 1. Investigate missing `registration_date` values by status.
 2. Check future and chronologically inconsistent dates.

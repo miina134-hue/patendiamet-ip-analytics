@@ -492,3 +492,29 @@ WHERE priority_date IS NOT NULL
   AND TRIM(priority_date) <> ''
 ORDER BY number_of_entries DESC
 LIMIT 10;
+
+-- 36. Whitespace and blank-value checks
+SELECT
+    COUNT(*) AS total_rows,
+
+    SUM(type IS NULL OR TRIM(type) = '')
+        AS missing_type,
+
+    SUM(status IS NULL OR TRIM(status) = '')
+        AS missing_status,
+
+    SUM(application_number IS NULL
+        OR TRIM(application_number) = '')
+        AS missing_application_number,
+
+    SUM(CHAR_LENGTH(type) <> CHAR_LENGTH(TRIM(type)))
+        AS type_with_outer_spaces,
+
+    SUM(CHAR_LENGTH(status) <> CHAR_LENGTH(TRIM(status)))
+        AS status_with_outer_spaces,
+
+    SUM(CHAR_LENGTH(application_number)
+        <> CHAR_LENGTH(TRIM(application_number)))
+        AS application_number_with_outer_spaces
+
+FROM patent;
