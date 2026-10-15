@@ -75,6 +75,15 @@ Nine 'EuPatent' records have a future 'registration_date' of 2026-11-16. All nin
 represent a scheduled or effective business-process date rather than a random data-entry error. These records are therefore flagged for domain validation
 rather than treated as confirmed data-quality problems.
 
+### Identifier consistency
+'application_number' and 'eu_patent_number' are unique across the dataset.
+
+'registration_number' is not globally unique, but duplicate values occur ascross different record types.
+No duplicates remain when 'registration_number' is evaluated together with 'type', suggesting that registration numbers use type-specific namespaces.
+
+Repeated 'pct_application_number' values correspond to different national 'application_number' values. This indicates a legitimate one-to-many relationship
+between an international/PCT filling and national records rather than duplicated observations.
+
 ## Next steps
 1. Investigate missing `registration_date` values by status.
 2. Check future and chronologically inconsistent dates.

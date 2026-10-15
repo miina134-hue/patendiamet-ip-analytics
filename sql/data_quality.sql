@@ -218,3 +218,184 @@ SELECT
 FROM patent
 WHERE registration_date > CURRENT_DATE()
 ORDER BY registration_date;
+
+-- 17. Duplicate application numbers
+SELECT
+    application_number,
+    COUNT(*) AS n
+FROM patent
+WHERE application_number IS NOT NULL
+  AND application_number <> ''
+GROUP BY application_number
+HAVING COUNT(*) > 1
+ORDER BY n DESC, application_number;
+
+-- 18. Duplicate registration numbers
+SELECT
+    registration_number,
+    COUNT(*) AS n
+FROM patent
+WHERE registration_number IS NOT NULL
+  AND registration_number <> ''
+GROUP BY registration_number
+HAVING COUNT(*) > 1
+ORDER BY n DESC, registration_number;
+
+-- 19. Duplicate European patent numbers
+SELECT
+    eu_patent_number,
+    COUNT(*) AS n
+FROM patent
+WHERE eu_patent_number IS NOT NULL
+  AND eu_patent_number <> ''
+GROUP BY eu_patent_number
+HAVING COUNT(*) > 1
+ORDER BY n DESC, eu_patent_number;
+
+-- 20. Duplicate PCT application numbers
+SELECT
+    pct_application_number,
+    COUNT(*) AS n
+FROM patent
+WHERE pct_application_number IS NOT NULL
+  AND pct_application_number <> ''
+GROUP BY pct_application_number
+HAVING COUNT(*) > 1
+ORDER BY n DESC, pct_application_number;
+
+-- 21. Count duplicate identifier values
+SELECT
+    'application_number' AS identifier,
+    COUNT(*) AS duplicate_values
+FROM (
+    SELECT application_number
+    FROM patent
+    WHERE application_number IS NOT NULL
+      AND application_number <> ''
+    GROUP BY application_number
+    HAVING COUNT(*) > 1
+) x
+
+UNION ALL
+
+SELECT
+    'registration_number',
+    COUNT(*)
+FROM (
+    SELECT registration_number
+    FROM patent
+    WHERE registration_number IS NOT NULL
+      AND registration_number <> ''
+    GROUP BY registration_number
+    HAVING COUNT(*) > 1
+) x
+
+UNION ALL
+
+SELECT
+    'eu_patent_number',
+    COUNT(*)
+FROM (
+    SELECT eu_patent_number
+    FROM patent
+    WHERE eu_patent_number IS NOT NULL
+      AND eu_patent_number <> ''
+    GROUP BY eu_patent_number
+    HAVING COUNT(*) > 1
+) x
+
+UNION ALL
+
+SELECT
+    'pct_application_number',
+    COUNT(*)
+FROM (
+    SELECT pct_application_number
+    FROM patent
+    WHERE pct_application_number IS NOT NULL
+      AND pct_application_number <> ''
+    GROUP BY pct_application_number
+    HAVING COUNT(*) > 1
+) x;
+
+-- 22. Inspect duplicated registration numbers
+SELECT
+    registration_number,
+    id,
+    type,
+    application_number,
+    application_date,
+    registration_date,
+    status
+FROM patent
+WHERE registration_number IN (
+    SELECT registration_number
+    FROM patent
+    WHERE registration_number IS NOT NULL
+      AND registration_number <> ''
+    GROUP BY registration_number
+    HAVING COUNT(*) > 1
+)
+ORDER BY registration_number, type
+LIMIT 40;
+
+-- 23. Record types among duplicated registration numbers
+SELECT
+    type,
+    COUNT(*) AS n
+FROM patent
+WHERE registration_number IN (
+    SELECT registration_number
+    FROM patent
+    WHERE registration_number IS NOT NULL
+      AND registration_number <> ''
+    GROUP BY registration_number
+    HAVING COUNT(*) > 1
+)
+GROUP BY type
+ORDER BY n DESC;
+
+-- 24. Inspect duplicated PCT application numbers
+SELECT
+    pct_application_number,
+    id,
+    type,
+    application_number,
+    registration_number,
+    application_date,
+    status,
+    owner
+FROM patent
+WHERE pct_application_number IN (
+    SELECT pct_application_number
+    FROM patent
+    WHERE pct_application_number IS NOT NULL
+      AND pct_application_number <> ''
+    GROUP BY pct_application_number
+    HAVING COUNT(*) > 1
+)
+ORDER BY pct_application_number, application_number;
+
+-- 25. Duplicate registration numbers within record type
+SELECT
+    type,
+    registration_number,
+    COUNT(*) AS n
+FROM patent
+WHERE registration_number IS NOT NULL
+  AND registration_number <> ''
+GROUP BY type, registration_number
+HAVING COUNT(*) > 1
+ORDER BY n DESC, type, registration_number;
+
+-- 26. Duplicate PCT and national application combinations
+SELECT
+    pct_application_number,
+    application_number,
+    COUNT(*) AS n
+FROM patent
+WHERE pct_application_number IS NOT NULL
+  AND pct_application_number <> ''
+GROUP BY pct_application_number, application_number
+HAVING COUNT(*) > 1
+ORDER BY n DESC;
