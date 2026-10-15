@@ -136,3 +136,42 @@ SELECT
 FROM patent
 GROUP BY type
 ORDER BY n DESC;
+
+-- 9. Missing registration dates by types and status
+SELECT
+    type,
+    status,
+    COUNT(*) AS n
+FROM patent
+WHERE registration_date IS NULL
+GROUP BY type, status
+ORDER BY type, n DESC;
+
+-- 10. Inspect exceptional records with lapsed/revoked status
+SELECT
+    id,
+    application_number,
+    registration_number,
+    application_date,
+    registration_date,
+    status,
+    type,
+    name_estonian
+FROM patent
+WHERE registration_date IS NULL
+  AND status IN ('revoked', 'lapsed')
+ORDER BY type, status;
+
+-- 11. Consistency between registration number and registration date
+SELECT
+    type,
+    COUNT(*) AS records_with_registration_number,
+    SUM(registration_date IS NULL) AS missing_registration_date,
+    ROUND(
+        100.0 * SUM(registration_date IS NULL) / COUNT(*),
+        3
+    ) AS pct_missing_registration_date
+FROM patent
+WHERE registration_number IS NOT NULL
+  AND registration_number <> ''
+GROUP BY type;

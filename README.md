@@ -58,6 +58,16 @@ to certain intellectual-property record types or are not populated consistently 
 
 For this reason, missingness is evaluated by 'type' and 'status' before deciding whether a field represets a genuine data-quality issue.
 
+## Registration-date consistency
+Most missing 'registration_date' values are concentrated in lifecycle statuses such as pending, withdrawn, rejected, deemed withdrawn, terminated, or not validated.
+This suggests that the majority of missing registration dates are structurally consistent with the underlying process rather than general data-quality failures.
+
+A small number of records with 'lapsed' or 'revoked' status also lack a registration date and were inspected separately.
+One 'EuPatent' record contains a registration number but no registration date.
+
+Across records with a non-missing 'registration_number', this inconsistency occurs only once, indicating a rare record-evel exception or a special business-process case
+that would require domain validation before being classified as an error.
+
 ## Next steps
 1. Investigate missing `registration_date` values by status.
 2. Check future and chronologically inconsistent dates.
