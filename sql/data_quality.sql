@@ -175,3 +175,46 @@ FROM patent
 WHERE registration_number IS NOT NULL
   AND registration_number <> ''
 GROUP BY type;
+
+-- 12. Registration date before application date
+SELECT
+    COUNT(*) AS registration_before_application
+FROM patent
+WHERE registration_date IS NOT NULL
+  AND application_date IS NOT NULL
+  AND registration_date < application_date;
+
+-- 13. Publication date before application date
+SELECT
+    COUNT(*) AS publication_before_application
+FROM patent
+WHERE publication_date IS NOT NULL
+  AND application_date IS NOT NULL
+  AND publication_date < application_date;
+
+-- 14. Decision date before application date
+SELECT
+    COUNT(*) AS decision_before_application
+FROM patent
+WHERE decision_date IS NOT NULL
+  AND application_date IS NOT NULL
+  AND decision_date < application_date;
+
+-- 15. Count future registration dates
+SELECT
+    COUNT(*) AS future_registration_dates
+FROM patent
+WHERE registration_date > CURRENT_DATE();
+
+-- 16. Inspect future registration dates
+SELECT
+    id,
+    type,
+    application_number,
+    registration_number,
+    application_date,
+    registration_date,
+    status
+FROM patent
+WHERE registration_date > CURRENT_DATE()
+ORDER BY registration_date;
