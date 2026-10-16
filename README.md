@@ -113,6 +113,106 @@ No leading or trailing spaces were detected in these fields either.
 
 These results indicate that the key identifying and categorical fields are consistent with respest to basic completeness and whitespace formatting.
 
+## Preliminary analytical findings
+The following findings are based on Patendiamet's public open-data extract downloaded on 14 October 2026.
+
+The analysis describes records contained in the extract. These should not automatically be interpreted as complete annual application or registration statistics, 
+as database coverage depends on publication requirements and administrative processes.
+
+1. Annual record counts by application year
+The dataset contains records with application dates ranging from 1994 to 2026.
+
+Annual record counts fluctuate substantially, reaching a maximum of 2,086 in 2003. Counts are considerably lower in recent application years.
+
+However, recent application years may be underrepresented because the extract contains records that have reached particular administratice or publication stages.
+The year 2026 is also incomplete.
+
+2. Annual record trens by intellectual-property type
+The distribution of records differs considerably across intellectual-property types.
+
+EuPatent records dominate much of the period following 2002, accounting for 1,986 of the 2,086 records with application dates in 2003.
+
+The other record types follow different patterns and have substantially smaller annual counts.
+
+This indicates that overall trends are strongly influenced by the composition of the dataset. Analyses should therefore distinguish intellectual-property record types.
+
+Note: Original database type codes are retained in the analysis. Their precise administrative definitions should be checked againt Patendiamet's documentation.
+
+3. Year-over-year changes by record type
+Year-over-year comparisons reveal substantial differences between record types.
+
+European patent record counts declined in every year from 2018 to 2024, fallinf from 860 to 28.
+
+Other categories show greater relative volatility. For example, DesignApplication record increased by 122.2% in 2023, representing an increase from 9 to 20 records.
+
+Percentage changes based on small denominators should be interpreted alongside absolute counts.
+
+These trends describe records contained in the current extract rather than necessarily representing changes in underlying intellectual property filing activity.
+
+4. Monthly record trends (2022-2024)
+Monthly analysis covers all 36 months from January 2022 to December 2024, with no zero-count months observed.
+
+Year     Record count
+
+2022     254
+
+2023     168
+
+2024     108
+
+Monthly fluctuations were observed, but no consistent seasonal pattern was identified across the three years.
+
+The relatively small number of monthly records limits the reliability of conclusins about seasonality.
+
+5. Monthly trends by intellectual-property type
+Disaggregating monthly record counts reveals that the overall decline between 2022 and 2024 is driven almost entirely by European patent records.
+
+European patent record counts decreased by 149, while the combined count for the other three record types increased from 77 to 80.
+
+Consequently, the overall decline does not reflect a uniform decrease across all record types.
+
+Recent European patent application years may be affected by administrative delays and the database's inclusion criteria.
+
+6. European patent records by registration year
+Grouping EuPatent records by registration_date produces a different historical distribution from grouping them by application_date.
+
+Registration-year counts decreased from 1,930 in 2018 to 637 in 2024, followed by an increase to 731 in 2025.
+
+The application-year series exhibits a substantially sharper decline across recent years.
+
+The two series represent different cohorts: records registered in a particular year may have original application dates several years earlier.
+
+Consequently, application-year and registration-year counts should not be treated as interchangeable indicators.
+
+The continuing decline in registration-year counts also suggests that application-to-registration delays alone cannot explain all observed trends.
+
+7. European patent application-to-registration intervals
+Analysis of EuPatent records registered between 2018 and 2025 reveals substantial intervals between the recorded application and registration dates.
+
+Average intervals range from approximately 5.8 to 6.8 years across registration-year cohorts.
+
+These substantial intervals help explain why recent application years contain relatively few European patent records in the public extract.
+
+However, the intervals represent differences between database fields and should not be interpreted as Patendiamet's own administrative processing times. European patent examination and other procedures may account for substantial portions of the interval.
+
+The analysis is also restricted to records with observed registration dates, and average intervals may be influenced by unusually long observations or changes in cohort composition.
+
+Further Python analysis will examine median intervals and the distribution of observations.
+
+#### Interpretation and data-coverage limitations
+
+The analysis highlights several important limitations:
+
+Publicly available records do not necessarily cover all applications received by Patendiamet.
+
+Different intellectual-property types follow different administrative processes.
+
+Application dates and registration dates represent different events and cohorts.
+
+Recent application years may be underrepresented because of publication and registration delays.
+
+Annual record counts should not be interpreted directly as indicators of innovation or patenting activity without validation against official statistics.
+
 ## Next steps
 1. Investigate missing `registration_date` values by status.
 2. Check future and chronologically inconsistent dates.
