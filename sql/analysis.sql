@@ -172,4 +172,70 @@ GROUP BY YEAR(registration_date)
 ORDER BY registration_year;
 
 
+-- 8. Status distribution within each record type
+-- Percentages are calculated within type; these are current statuses,
+-- not application success rates or status-transition probabilities.
+WITH status_counts AS (
+    SELECT
+        type,
+        status,
+        COUNT(*) AS record_count
+    FROM patent
+    GROUP BY type, status
+)
+SELECT
+    type,
+    status,
+    record_count,
+    ROUND(
+        100.0 * record_count /
+        SUM(record_count) OVER (PARTITION BY type),
+        1
+    ) AS pct_within_type
+FROM status_counts
+ORDER BY type, record_count DESC;
+
+
+-- 9. Annual registration activity by type, 2018-2025
+-- Counts are drawn from the snapshot; the meaning of registration_date
+-- may differ by type. Records without registration_dates are excluded.
+SELECT
+    YEAR(registration_date) AS registration_year,
+    type,
+    COUNT(*) AS record_count
+FROM patent
+WHERE registration_date >= '2018-01-01'
+  AND registration_date < '2026-01-01'
+GROUP BY
+    YEAR(registration_date),
+    type
+ORDER BY
+    registration_year,
+    type;
+
+
+-- 10. Application-to-registration intervals by record type 2018-2025
+-- Observed intervals only, excluding unregistered/missing-date records.
+-- Means are influenced by long intervals; medians are planned in Python.
+SELECT
+    type,
+    COUNT(*) AS record_count,
+    ROUND(
+        AVG(DATEDIFF(registration_date, application_date)),
+        0
+    ) AS avg_days_between_dates,
+    ROUND(
+        AVG(DATEDIFF(registration_date, application_date)) / 365.25,
+        1
+    ) AS avg_years_between_dates,
+    MIN(DATEDIFF(registration_date, application_date)) AS min_days,
+    MAX(DATEDIFF(registration_date, application_date)) AS max_days
+FROM patent
+WHERE application_date IS NOT NULL
+  AND registration_date IS NOT NULL
+  AND registration_date >= application_date
+  AND registration_date >= '2018-01-01'
+  AND registration_date < '2026-01-01'
+GROUP BY type
+ORDER BY record_count DESC;
  

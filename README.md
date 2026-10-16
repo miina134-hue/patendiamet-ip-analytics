@@ -199,6 +199,41 @@ The analysis is also restricted to records with observed registration dates, and
 
 Further Python analysis will examine median intervals and the distribution of observations.
 
+8. Current status distributions by record type
+The distribution of recorded statuses differs substantially across intellectual-property types.
+
+Status distributions reflect the composition and administrative history of records included in the snapshot. 
+They should not be interpreted as application success rates, rejection probabilities, or indicators of Patendiamet's operational performance.
+
+The status distributions also help explain some of the missing registration dates identified during data-quality assessment. 
+Missing values may reflect administrative lifecycle stages rather than data-entry errors.
+
+The original type label DesignApplication is retained. Evidence from official statistics suggests that it relates to national patent applications rather than industrial designs; 
+the source-system definition should be verified before assigning a final business-facing label.
+
+
+9. Annual registration activity by record type (2018-2025)
+Registration-year analysis reveals substantial differences across intellectual-property types.
+
+European patent records dominate the annual counts. Their number decreased by approximately 67.0% between 2018 and 2024, followed by a 14.8% increase in 2025.
+
+By comparison, the three other record types together accounted for 74 records in 2018 and 79 in 2024. 
+Their combined registration-year counts were therefore relatively stable between these endpoints.
+
+The overall decline in registration-year counts is primarily associated with EuPatent records rather than a uniform decrease across intellectual-property types.
+
+10. Application-to-registration intervals by record type
+The interval between application_date and registration_date was calculated for records registered between 2018 and 2025, 
+excluding records with missing dates or registration dates preceding application dates.
+
+European patent records exhibit considerably longer average intervals than the other intellectual-property types.
+
+The substantial difference helps explain why recent European patent application-year cohorts are sparsely represented in the public database extract.
+
+The results support analysing registration intervals separately by record type rather than combining them into a single operational performance indicator.
+
+A planned Python analysis will calculate median intervals and examine their distributions to complement these descriptive averages.
+
 #### Interpretation and data-coverage limitations
 
 The analysis highlights several important limitations:
