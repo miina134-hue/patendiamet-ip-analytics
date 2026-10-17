@@ -248,7 +248,7 @@ Recent application years may be underrepresented because of publication and regi
 
 Annual record counts should not be interpreted directly as indicators of innovation or patenting activity without validation against official statistics.
 
-## Python vaidation of registration intervals
+## Python validation of registration intervals
 The SQL application-to-registration interval analysis was reproduced in Python using pandas.
 
 All 10,848 eligible records were retained, and record counts and mean intervals matched the earlier SQL results.
@@ -257,6 +257,73 @@ Median intervals were also calculated which are lower than mean intervals across
 
 These results describe intervals betweem recorded database dates, not verified Patendiamet processing times. The analysis is restricted to records registered during 2018-2025
 with valid application and registration dates.
+
+## Python data processing
+The Python pipeline is implemented in python/extract_transform.py using Python 3.13, pandas, SQLAlchemy and PyMySQL.
+
+It extract records from the local MariaDB database, validates their structure, calculates registration intervals, normalizes IPC classifications and exports datasets for Power BI.
+
+## Data extraction and validation
+The extracted dataset contains 34,223 records and 41 columns, including 34,223 unique record IDs.
+
+The Python validation reproduces key findings from the SQL assessment, including 2,966 records with missing registration dates. Original database records are not modified.
+
+## Application-to-registration intervals
+Registration intervals are calculated as differences between recorded calendar dates for records registered during 2018-2025, excluding records with missing or chronologically inconsistent dates.
+
+A total of 10,848 records meet these criteria.
+
+| Record type | Mean interval | Median interval |
+|---|---:|---:|
+| EuPatent | 6.1 years | 5.2 years |
+| UtilityModel | 1.5 years | 1.2 years |
+| AdditionalProtection | 2.1 years | 1.5 years |
+| DesignApplication | 2.8 years | 2.6 years |
+
+The medians are lower than the means, consistent with longer observations influencing the averages.
+
+These are descriptive intervals between database fields, not measures of Patendiamet's own administrative processing time.
+
+## IPC classification normalization
+The ipc_class field contains multiple comma-separated classifications for many records.
+
+Python separates the codes into individual patent-classification assignments, strips surrounding whitespace and removes repeated assignment within the same patent.
+
+The resulting normalized table contains:
+- 33,629 unique patent IDs
+- 131,929 unique patent-IPC assignments
+- 63 repeated assignment removed during normalization
+
+The original 34,223-record dataset is preserved.
+
+## Power BI exports
+The script exports three CSV datasets into data/processed/:
+
+| File | Description |
+|---|---|
+| `patent_records.csv` | Original records with derived years and registration intervals |
+| `ipc_codes.csv` | Unique patent–IPC classification assignments |
+| `registration_intervals_summary.csv` | Summary statistics by record type |
+
+The export validation confirms 34,223 patent records, 131,929 IPC assignments and 10,848 eligible interval observations.
+
+Record-level intervals allow Power BI to calculate dynamically filtered means and medians. The precomputed summary provides fixed reference statistics.
+
+## Reproducing the Python workflow
+Requirements: Python 3.13, MariaDB with the patendiamet_analytics database imported, and the packages listed in requirements.txt.
+
+From the project directory in Git Bash:
+
+python -m venv .venv
+source .venv/Scripts/activate
+python -m pip install -r requirements.txt
+python python/extract_transform.py
+
+The script prompts for the local MariaDB password without storing it in the source code.
+
+The CSV files are regenerated automatically. The pipeline is read-only with respect to the source database.
+
+Data limitations: The outputs describe the public Patendiamet database snapshot from 14 October 2026, not necessarily all applications received or all registration event. Database record types, administrative statuses and data fields require context-specific interpretation.
 
 ## Next steps
 1. Investigate missing `registration_date` values by status.
