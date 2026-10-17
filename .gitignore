@@ -1,12 +1,85 @@
-__pycache__/
-*.pyc
-.ipynb_checkpoints/
-*.db
-*.sqlite
-.venv/
-venv/
+# ============================================================
+# PATENDIAMET IP ANALYTICS
+# Git Ignore Configuration
+# ============================================================
+#
+# Purpose:
+# Exclude local environments, temporary files, credentials,
+# and raw database dumps from version control.
+#
+# The repository tracks source code, SQL queries,
+# documentation, and reproducibility instructions.
+#
+# Ignored files can be recreated, downloaded again,
+# or contain local configuration and sensitive information.
+#
+# ============================================================
+
+
+# ============================================================
+# Raw downloaded data
+# ============================================================
+
+# Original Patendiamet database archives
+data/raw/*.sql.gz
+
+# Extracted SQL database dumps
+data/raw/*.sql
+
+
+# ============================================================
+# Microsoft Office temporary files
+# ============================================================
+
+# Temporary lock files created by Word and Excel
 ~$*
 
-# Raw downloaded data
-data/raw/*.sql.gz
-data/raw/*.sql
+
+# ============================================================
+# Python environment and temporary files
+# ============================================================
+
+# Python virtual environments
+.venv/
+venv/
+
+# Python bytecode and cache files
+__pycache__/
+*.py[cod]
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Testing and development caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local Python/application environment files and credentials
+.env
+.env.*
+!.env.example
+
+# Local SQLite database files
+*.db
+*.sqlite
+
+
+# ============================================================
+# R and RStudio temporary files
+# ============================================================
+
+# R command history and saved workspace
+.Rhistory
+.RData
+.Ruserdata
+
+# RStudio project-specific user settings
+.Rproj.user/
+
+# Local R environment variables (may contain credentials)
+.Renviron
+.Renviron.*
+
+# R temporary files
+.Rtmp*/
