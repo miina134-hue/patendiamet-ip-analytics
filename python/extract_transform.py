@@ -304,6 +304,22 @@ patent_records = df[
     ]
 ].copy()
 
+# Add record-level application-to-registration intervals.
+# Match intervals to the main dataset using the unique patent ID.
+# This is equivalent to a left join in SQL.
+
+interval_by_id = intervals.set_index("id")["interval_days"]
+
+assert interval_by_id.index.is_unique, (
+    "Duplicate IDs detected in interval dataset"
+)
+
+patent_records["interval_days"] = (
+    patent_records["id"]
+    .map(interval_by_id)
+    .astype("Int64")
+)
+
 # Convert dates and derive year fields for Power BI filters.
 
 for column in ["application_date", "registration_date"]:
@@ -373,8 +389,32 @@ interval_check = pd.read_csv(
 assert len(records_check) == 34223
 assert records_check["id"].is_unique
 
+# Validate record-level registration intervals.
+
+assert "interval_days" in records_check.columns, (
+    "Missing interval_days column"
+)
+
+assert records_check["interval_days"].notna().sum() == 10848, (
+    "Unexpected number of eligible registration intervals"
+)
+
+assert records_check["interval_days"].dropna().ge(0).all(), (
+    "Negative registration intervals detected"
+)
+
+# Confirm that the number of valid intervals is consistent
+# with the interval summary exported separately.
+
+assert (
+    records_check["interval_days"].notna().sum()
+    == interval_check["record_count"].sum()
+), "Record-level and summary interval counts do not match"
+
+
 assert len(ipc_check) == len(ipc_codes)
 assert ipc_check["id"].nunique() == 33629
+
 
 assert interval_check["record_count"].sum() == 10848
 
@@ -386,7 +426,15 @@ print(
     f"{interval_check['record_count'].sum():,}"
 )
 
+print("\nRECORD-LEVEL INTERVAL VALIDATION")
+print(
+    "Records with valid intervals: "
+    f"{records_check['interval_days'].notna().sum():,}"
+)
+print(
+    "Records without eligible intervals: "
+    f"{records_check['interval_days'].isna().sum():,}"
+)
+
 print("\nAll Power BI datasets validated successfully!")
-
-
 
