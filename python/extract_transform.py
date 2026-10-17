@@ -187,3 +187,92 @@ print(
 
 
 
+# ------------------------------------------------------------
+# 7. Normalize multi-valued IPC classifications
+# ------------------------------------------------------------
+
+
+# Create a separate table while preserving the original data.
+# Keep only records with a populated IPC classification field.
+
+ipc_source = df.loc[
+    df["ipc_class"].fillna("").str.strip().ne(""),
+    ["id", "ipc_class"]
+].copy()
+
+# Count records with multiple classifications.
+multiple_ipc = ipc_source["ipc_class"].str.contains(
+    ",", regex=False
+).sum()
+
+# Split comma-separated classifications into lists.
+ipc_codes = ipc_source.assign(
+    ipc_code=ipc_source["ipc_class"].str.split(",")
+)
+
+# Create one row per individual classification.
+ipc_codes = ipc_codes.explode(
+    "ipc_code", ignore_index=True
+)
+
+# Remove surrounding whitespace.
+ipc_codes["ipc_code"] = ipc_codes["ipc_code"].str.strip()
+
+# Exclude empty classification entries.
+ipc_codes = ipc_codes.loc[
+    ipc_codes["ipc_code"].notna()
+    & ipc_codes["ipc_code"].ne(""),
+    ["id", "ipc_code"]
+].copy()
+
+# Identify repeated patent-classification pairs.
+duplicate_pairs = ipc_codes.duplicated(
+    subset=["id", "ipc_code"]
+).sum()
+
+# Retain one row per unique patent-classification pair.
+ipc_codes = (
+    ipc_codes
+    .drop_duplicates(subset=["id", "ipc_code"])
+    .sort_values(["id", "ipc_code"])
+    .reset_index(drop=True)
+)
+
+
+# ------------------------------------------------------------
+# 8. Validate normalized IPC classifications
+# ------------------------------------------------------------
+
+
+print("\nIPC CLASSIFICATION NORMALIZATION")
+
+print(f"Records with IPC data: {len(ipc_source):,}")
+print(f"Records with multiple IPC values: {multiple_ipc:,}")
+print(f"Normalized IPC assignments: {len(ipc_codes):,}")
+print(f"Unique patent IDs: {ipc_codes['id'].nunique():,}")
+print(f"Repeated pairs removed: {duplicate_pairs:,}")
+
+# Every record with IPC data must remain represented.
+assert ipc_codes["id"].nunique() == len(ipc_source), (
+    "Some records with IPC data were lost during normalization"
+)
+
+# Every classification must contain a nonempty value.
+assert ipc_codes["ipc_code"].notna().all()
+assert ipc_codes["ipc_code"].ne("").all()
+
+# Each patent-classification combination must be unique.
+assert not ipc_codes.duplicated(
+    subset=["id", "ipc_code"]
+).any()
+
+# Check that the original dataset remains unchanged.
+assert len(df) == 34223
+
+print("\nSAMPLE OF NORMALIZED IPC DATA")
+print(ipc_codes.head(10).to_string(index=False))
+
+print("\nIPC normalization and validation successful!")
+
+
+
