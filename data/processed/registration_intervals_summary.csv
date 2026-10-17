@@ -1,0 +1,5 @@
+﻿type,record_count,mean_days,median_days,min_days,max_days,mean_years,median_years
+EuPatent,10259,2222.7826298859536,1911.0,295,7336,6.1,5.2
+UtilityModel,256,536.75,454.0,109,3036,1.5,1.2
+AdditionalProtection,246,749.6422764227642,534.5,38,3844,2.1,1.5
+DesignApplication,87,1034.8735632183907,940.0,568,1991,2.8,2.6

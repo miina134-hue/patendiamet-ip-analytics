@@ -271,8 +271,122 @@ assert len(df) == 34223
 
 print("\nSAMPLE OF NORMALIZED IPC DATA")
 print(ipc_codes.head(10).to_string(index=False))
-
 print("\nIPC normalization and validation successful!")
+
+
+
+# ------------------------------------------------------------
+# 9. Prepare and export Power BI datasets
+# ------------------------------------------------------------
+
+
+from pathlib import Path
+
+# Locate the project root independently of the current
+# working directory.
+
+project_root = Path(__file__).resolve().parent.parent
+output_dir = project_root / "data" / "processed"
+output_dir.mkdir(parents=True, exist_ok=True)
+
+
+# Prepare the main patent-record table.
+# Retain one row per original record.
+# Exclude unnecessary personal information from the export.
+
+patent_records = df[
+    [
+        "id",
+        "type",
+        "status",
+        "application_date",
+        "registration_date",
+    ]
+].copy()
+
+# Convert dates and derive year fields for Power BI filters.
+
+for column in ["application_date", "registration_date"]:
+    patent_records[column] = pd.to_datetime(
+        patent_records[column],
+        errors="coerce"
+    )
+
+patent_records["application_year"] = (
+    patent_records["application_date"].dt.year.astype("Int64")
+)
+
+patent_records["registration_year"] = (
+    patent_records["registration_date"].dt.year.astype("Int64")
+)
+
+# Convert the interval summary into a regular table.
+interval_export = interval_summary.reset_index()
+
+# Export the three datasets.
+
+patent_records.to_csv(
+    output_dir / "patent_records.csv",
+    index=False,
+    encoding="utf-8-sig",
+    date_format="%Y-%m-%d"
+)
+
+ipc_codes.to_csv(
+    output_dir / "ipc_codes.csv",
+    index=False,
+    encoding="utf-8-sig"
+)
+
+interval_export.to_csv(
+    output_dir / "registration_intervals_summary.csv",
+    index=False,
+    encoding="utf-8-sig"
+)
+
+print("\nPOWER BI DATASETS EXPORTED")
+print(f"Output directory: {output_dir}")
+
+
+# ------------------------------------------------------------
+# 10. Validate exported datasets
+# ------------------------------------------------------------
+
+
+records_check = pd.read_csv(
+    output_dir / "patent_records.csv",
+    encoding="utf-8-sig"
+)
+
+ipc_check = pd.read_csv(
+    output_dir / "ipc_codes.csv",
+    encoding="utf-8-sig"
+)
+
+interval_check = pd.read_csv(
+    output_dir / "registration_intervals_summary.csv",
+    encoding="utf-8-sig"
+)
+
+# Confirm that exported datasets preserve expected counts.
+
+assert len(records_check) == 34223
+assert records_check["id"].is_unique
+
+assert len(ipc_check) == len(ipc_codes)
+assert ipc_check["id"].nunique() == 33629
+
+assert interval_check["record_count"].sum() == 10848
+
+print("\nEXPORT VALIDATION")
+print(f"Patent records: {len(records_check):,}")
+print(f"IPC assignments: {len(ipc_check):,}")
+print(
+    "Registration interval observations: "
+    f"{interval_check['record_count'].sum():,}"
+)
+
+print("\nAll Power BI datasets validated successfully!")
 
 
 
