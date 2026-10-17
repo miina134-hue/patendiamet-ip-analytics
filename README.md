@@ -325,6 +325,158 @@ The CSV files are regenerated automatically. The pipeline is read-only with resp
 
 Data limitations: The outputs describe the public Patendiamet database snapshot from 14 October 2026, not necessarily all applications received or all registration event. Database record types, administrative statuses and data fields require context-specific interpretation.
 
+## Power BI dashboard
+![Patendiamet IP Analytics](docs/patendiamet_dashboard.png)
+
+The Power BI component presents an interactive overview of intellectual-property records in Patendiamet's public database extract dated 14 October 2026.
+
+The dashboard was developed as an independent portfolio project to demonstrate data modelling, DAX calculations, interactive visualization and the interpretation of administrative data.
+
+The report is saved in powerbi/patendiamet_dashboard.pbix.
+
+### Data model
+The dashboard uses three datasets prepared by the Python pipeline.
+
+| Table | Records | Purpose |
+|---|---|---|
+| patent_records | 34,223 | Main record-level table containing intellectual-property types, statuses, dates and derived registration intervals |
+| ipc_code | 131,929 | Normalized patent–IPC classification assignments |
+| registration_intervals_summary | 4 | Precomputed interval statistics by record type, used as a reference |
+
+The relationship between patent_records and ipc_codes is based on the unique record identifier id.
+
+- Cardinality: One-to-many (1:*).
+- Filter direction: Single, from patent_records to ipc_codes.
+- Relationship status: Active.
+
+This structure allows record-type filters to affect IPC classification analyses while preventing classification assignments from being mistaken for separate intellectual-property records.
+
+The registration_intervals_summary table is intentionally disconnected from the other tables. It provides fixed Python reference statistics, whereas the dashboard's DAX measures calculate results dynamically from individual records.
+
+### DAX measures
+The dashboard implements the following measures:
+
+| Measure | Calculation | Purpose |
+|---|---|---|
+| Total Records | DISTINCTCOUNT(patent_records[id]) | Counts distinct records |
+| Eligible Interval Records | COUNT(patent_records[interval_days]) | Counts records with eligible registration intervals |
+| Mean Interval (Years) | AVERAGE(patent_records[interval_days]) / 365.25 | Calculates the mean interval in years |
+| Median Interval (Years) | MEDIAN(patent_records[interval_days]) / 365.25 | Calculates the median interval in years |
+| Records by IPC Section | DISTINCTCOUNT(ipc_codes[id]) | Counts distinct records within each IPC technology section |
+
+The interval measures exclude blank values and respond to the filter context.
+
+With all record types included, the dashboard displays:
+
+| Indicator | Value |
+|---|---|
+| Total records | 34,223 |
+| Eligible interval records | 10,848 |
+| Mean interval | 5.9 years |
+| Median interval | 5.1 years |
+
+These values are consistent with the Python analysis.
+
+### Dashboard visualizations
+The dashboard contains four analytical charts.
+
+1. Records by intellectual-property type
+
+A horizontal bar chart shows the composition of the October 2026 public database snapshot.
+
+European patent records form the largest category, followed by records labelled DesignApplication, UtilityModel and AdditionalProtection in the source system.
+
+The original database type codes are retained to avoid introducing unverified category definitions.
+
+2. Registration-year trends by record type
+
+A line chart compares annual record counts by registration_year for 2018–2025.
+
+European patent records dominate the series and exhibit a decline from 1,930 in 2018 to 637 in 2024, followed by an increase to 731 in 2025.
+
+The other categories have considerably smaller annual counts. The chart's Y-axis can adjust when an individual type is selected.
+
+These counts refer to records grouped by the database's registration-date field and should not automatically be equated with Patendiamet's official annual registration or validation statistics.
+
+3. Application-to-registration intervals by record type
+
+A clustered horizontal bar chart compares mean and median intervals in years.
+
+| Record type | Mean | Median |
+|---|---|---|
+| EuPatent | 6.1 | 5.2 |
+| DesignApplication | 2.8 | 2.6 |
+| AdditionalProtection | 2.1 | 1.5 |
+| UtilityModel | 1.5 | 1.2 |
+
+The analysis includes records registered during 2018–2025 with valid application and registration dates.
+
+Because the medians are consistently lower than the means, the results suggest that longer observations influence the average intervals.
+
+The measures describe differences between recorded dates, not Patendiamet's own administrative processing times.
+
+4. Patent records by IPC technology section
+
+A column chart displays distinct records associated with each of the eight International Patent Classification sections (A–H).
+
+The most frequently represented sections are:
+
+- A — Human necessities: 18,809 records.
+- C — Chemistry and metallurgy: 14,259 records.
+- B — Performing operations and transporting: 4,606 records.
+
+Descriptive technology-section labels are available through chart tooltips.
+
+A record can belong to multiple IPC sections. Consequently, section counts are not additive and should not be interpreted as mutually exclusive shares of all records.
+
+### Interactive filtering
+The dashboard includes a record-type dropdown slicer.
+
+Selecting a particular type updates the KPI cards and relevant analytical charts.
+
+For example, selecting EuPatent produces:
+
+| Measure | Filtered result |
+|---|---|
+| Total records | 26,140 |
+| Eligible interval records | 10,259 |
+| Mean interval | 6.1 years |
+| Median interval | 5.2 years |
+
+These results were checked against the Python output.
+
+The relationship between the main records and IPC assignments allows filtering from patent_records to ipc_codes.
+
+However, IPC-section selections do not automatically filter all record-level KPI cards because the relationship uses single-direction filtering.
+
+### Data coverage and interpretation
+The dashboard describes the records available in Patendiamet's October 2026 public open-data extract.
+
+Several limitations are important:
+
+- The public database does not necessarily include every application received by Patendiamet.
+- Different record types are subject to different publication, registration and administrative processes.
+- Counts by application or registration year may differ from official annual statistics.
+- Registration intervals describe differences between database fields rather than processing times attributable to Patendiamet.
+- Registration-interval measures include only eligible records registered during 2018–2025.
+- IPC classifications are non-exclusive; a record can belong to multiple technology sections.
+- The original source-system category labels are preserved where their precise administrative interpretation requires further verification.
+
+The dashboard should therefore be interpreted as an exploratory analysis of public administrative records, not as an official statistical report or an assessment of Patendiamet's operational performance.
+
+### Reproduction and files
+The Power BI report uses the CSV files generated by python/extract_transform.py:
+
+- data/processed/patent_records.csv
+- data/processed/ipc_codes.csv
+- data/processed/registration_intervals_summary.csv
+
+The .pbix report contains the data model, DAX measures, interactive filters and visualizations.
+
+Refreshing the report requires access to the processed CSV files at the configured source paths. If the project is moved to another computer, the Power Query file paths may need updating.
+
+The dashboard was developed independently using publicly available Patendiamet data and is not an official Patendiamet publication.
+
 ## Next steps
 1. Investigate missing `registration_date` values by status.
 2. Check future and chronologically inconsistent dates.
