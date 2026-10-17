@@ -248,6 +248,16 @@ Recent application years may be underrepresented because of publication and regi
 
 Annual record counts should not be interpreted directly as indicators of innovation or patenting activity without validation against official statistics.
 
+## Python vaidation of registration intervals
+The SQL application-to-registration interval analysis was reproduced in Python using pandas.
+
+All 10,848 eligible records were retained, and record counts and mean intervals matched the earlier SQL results.
+
+Median intervals were also calculated which are lower than mean intervals across all four types, suggesting that longer observations influence the averages.
+
+These results describe intervals betweem recorded database dates, not verified Patendiamet processing times. The analysis is restricted to records registered during 2018-2025
+with valid application and registration dates.
+
 ## Next steps
 1. Investigate missing `registration_date` values by status.
 2. Check future and chronologically inconsistent dates.

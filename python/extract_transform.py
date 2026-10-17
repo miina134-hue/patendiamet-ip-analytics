@@ -87,3 +87,103 @@ print("\nInitial extraction and validation successful!")
 
 
 
+# ------------------------------------------------------------
+# 5. Prepare application-to-registration intervals
+# ------------------------------------------------------------
+
+
+# Work on a copy to preserve the original extracted data.
+intervals = df[
+    ["id", "type", "application_date", "registration_date"]
+].copy()
+
+# Convert source dates into pandas datetime values.
+intervals["application_date"] = pd.to_datetime(
+    intervals["application_date"],
+    errors="coerce"
+)
+
+intervals["registration_date"] = pd.to_datetime(
+    intervals["registration_date"],
+    errors="coerce"
+)
+
+# Match the eligibility rules used in SQL Query 10:
+# - Both dates must be present.
+# - Registration must not precede application.
+# - Registration occurred between 2018 and 2025.
+
+valid_intervals = (
+    intervals["application_date"].notna()
+    & intervals["registration_date"].notna()
+    & (
+        intervals["registration_date"]
+        >= intervals["application_date"]
+    )
+    & (
+        intervals["registration_date"]
+        >= pd.Timestamp("2018-01-01")
+    )
+    & (
+        intervals["registration_date"]
+        < pd.Timestamp("2026-01-01")
+    )
+)
+
+intervals = intervals.loc[valid_intervals].copy()
+
+# Calculate the number of days between the two dates.
+# Match MariaDB DATEDIFF() by comparing calendar dates.
+# Ignore any time-of-day components in the source fields.
+intervals["interval_days"] = (
+    intervals["registration_date"].dt.normalize()
+    - intervals["application_date"].dt.normalize()
+).dt.days
+
+print("\nREGISTRATION INTERVAL DATASET")
+print(f"Eligible records: {len(intervals):,}")
+
+
+# ------------------------------------------------------------
+# 6. Summarize registration intervals by record type
+# ------------------------------------------------------------
+
+
+interval_summary = (
+    intervals
+    .groupby("type")
+    .agg(
+        record_count=("interval_days", "size"),
+        mean_days=("interval_days", "mean"),
+        median_days=("interval_days", "median"),
+        min_days=("interval_days", "min"),
+        max_days=("interval_days", "max"),
+    )
+    .sort_values("record_count", ascending=False)
+)
+
+# Convert the mean and median intervals into years.
+interval_summary["mean_years"] = (
+    interval_summary["mean_days"] / 365.25
+).round(1)
+
+interval_summary["median_years"] = (
+    interval_summary["median_days"] / 365.25
+).round(1)
+
+print("\nAPPLICATION-TO-REGISTRATION INTERVALS BY TYPE")
+
+print(
+    interval_summary[
+        [
+            "record_count",
+            "mean_years",
+            "median_years",
+            "min_days",
+            "max_days",
+        ]
+    ].to_string()
+)
+
+
+
