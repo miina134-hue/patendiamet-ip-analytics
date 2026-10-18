@@ -1,8 +1,10 @@
 
-# Patendiamet open-data analytics
+# Inventions IP Analytics — Patendiamet Open Data
+
+**Power BI dashboard:** *Leiutiste õiguskaitse andmeanalüüs*
 
 **Independent portfolio project | SQL · MariaDB · Python/pandas · Power BI**  
-**Data snapshot:** 14 October 2026
+**Data snapshot:** 14 October 2026 (`202610140200_avaandmed.sql.gz`)
 
 This project explores the quality, structure and analytical value of records in Patendiamet's public **"Leiutiste MYSQL"** database extract. It combines SQL data-quality checks, Python data preparation and an interactive Power BI dashboard to turn administrative records into interpretable indicators.
 
@@ -75,7 +77,7 @@ For IPC charts, a record is counted once *within* each IPC section, but may belo
 
 The Python script generates three files under `data/processed/`:
 
-- `patent_records.csv` — source records with derived year and interval fields;
+- `patent_records.csv` — selected non-personal source fields, with derived year and interval fields;
 - `ipc_codes.csv` — normalized, deduplicated record–IPC assignments;
 - `registration_intervals_summary.csv` — reference statistics by record type.
 

@@ -3,7 +3,7 @@
 # Data Extraction and Transformation
 # ============================================================
 #
-# Data source: Patendiamet public open-data extract
+# Data source: Patendiamet "Leiutiste MYSQL" open-data extract
 # Snapshot: 14 October 2026
 # Database: patendiamet_analytics (MariaDB)
 # Source table: patent

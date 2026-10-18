@@ -3,7 +3,7 @@
 -- Data Quality Assessment
 -- ============================================================
 --
--- Data source: Patendiamet public open-data extract
+-- Data source: Patendiamet "Leiutiste MYSQL" open-data extract
 -- Snapshot: 14 October 2026
 -- Database: patendiamet_analytics (MariaDB)
 -- Source table: patent
@@ -45,7 +45,8 @@ SELECT
     type,
     COUNT(*) AS n
 FROM patent
-GROUP BY typeORDER BY n DESC;
+GROUP BY type
+ORDER BY n DESC;
 
 
 -- 2. Record counts by status

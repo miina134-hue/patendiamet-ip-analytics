@@ -1,6 +1,6 @@
 -- ============================================================
 -- Patendiamet IP Analytics: business analysis queries
--- Source: Patendiamet open-data dump (2026-10-14 snapshot)
+-- Source: Patendiamet "Leiutiste MYSQL" dump (2026-10-14 snapshot)
 -- Database: patendiamet_analytics | Source table: patent
 -- ============================================================
 -- Important interpretation notes:
@@ -45,7 +45,7 @@ ORDER BY
 -- 3. Year-over-year changes by record type
 -- LAG() compares each type with its preceeding observed application year.
 -- Growth is reported only if that preceding year is consecutive.
--- Earlier years remain in the CTE so 2019 is compared with 2017.
+-- Earlier years remain in the CTE so 2018 can be compared with 2017.
 WITH yearly_counts AS (
     SELECT
         YEAR(application_date) AS application_year,
@@ -216,7 +216,8 @@ ORDER BY
 
 -- 10. Application-to-registration intervals by record type 2018-2025
 -- Observed intervals only, excluding unregistered/missing-date records.
--- Means are influenced by long intervals; medians are planned in Python.
+-- Means may be influenced by long intervals; medians are calculated
+-- separately in Python for comparison.
 SELECT
     type,
     COUNT(*) AS record_count,
